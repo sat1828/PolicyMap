@@ -1,9 +1,6 @@
 # PolicyMap — Cross-Platform Community Guidelines Audit
 
 > A primary-source-only Trust & Safety policy audit of YouTube, Reddit, TikTok, and Meta/Instagram across 12 content categories and 23 documented cross-platform gaps.
-
-**To use this repo:** Replace `sat1828` with your GitHub username in the citation section below, then push.
-
 ---
 
 ## What This Is
