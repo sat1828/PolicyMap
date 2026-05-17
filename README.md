@@ -2,7 +2,7 @@
 
 > A primary-source-only Trust & Safety policy audit of YouTube, Reddit, TikTok, and Meta/Instagram across 12 content categories and 23 documented cross-platform gaps.
 
-**To use this repo:** Replace `YOUR_USERNAME` with your GitHub username in the citation section below, then push.
+**To use this repo:** Replace `sat1828` with your GitHub username in the citation section below, then push.
 
 ---
 
@@ -178,14 +178,6 @@ All confirmed from live fetches during research:
 
 ---
 
-## Interview Answer
-
-When asked about this project, lead with a finding, not the structure:
-
-> *"One of the most interesting findings was TikTok's FYF de-amplification mechanism — it's the only platform that has formally documented a mid-tier enforcement action that sits between 'remove' and 'allow.' Content can exist on the platform and be completely invisible to most users because the algorithm won't recommend it. YouTube, Reddit, and Meta don't have an equivalent documented category. That has real implications for a moderator — the question is no longer just 'should this be removed?' It's also 'should this be algorithmically suppressed even if it stays up?' That's a fundamentally different decision with no policy anchor on three of the four major platforms."*
-
----
-
 ## Disclaimer
 
 This report is an independent academic analysis. Not affiliated with or endorsed by YouTube, Reddit, TikTok, or Meta. All policy citations are from primary platform policy documents accessed May 2025. Verify currency before operational use — policies change.
@@ -195,5 +187,5 @@ This report is an independent academic analysis. Not affiliated with or endorsed
 ```
 PolicyMap: A Cross-Platform Community Guidelines Audit for Trust & Safety Professionals.
 Version 1.0. May 2025. Primary sources accessed May 2025.
-Available at: https://github.com/YOUR_USERNAME/PolicyMap
+Available at: https://github.com/sat1828/PolicyMap
 ```
