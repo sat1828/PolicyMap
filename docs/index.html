@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PolicyMap — Cross-Platform Community Guidelines Audit</title>
+<style>
+  :root {
+    --navy: #1F3864; --steel: #2C4770; --lite: #D6DCE4;
+    --yt: #FF0000; --rd: #FF4500; --tk: #18181B; --mt: #1877F2;
+    --green: #166534; --amber: #92400e; --red: #991B1B;
+    --bg: #F8FAFC; --card: #FFFFFF; --text: #1E293B; --muted: #64748B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, var(--navy) 0%, #2C5F9E 100%); color: #fff; padding: 72px 24px 60px; text-align: center; }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; letter-spacing: -1px; margin-bottom: 12px; }
+  .hero p.sub { font-size: 1.2rem; opacity: 0.88; max-width: 680px; margin: 0 auto 28px; }
+  .badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+  .badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+  .hero-links { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn { padding: 12px 28px; border-radius: 8px; font-size: 1rem; font-weight: 700; text-decoration: none; transition: transform 0.15s, box-shadow 0.15s; display: inline-block; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+  .btn-primary { background: #fff; color: var(--navy); }
+  .btn-secondary { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.6); }
+
+  /* CONTAINER */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* FINDINGS */
+  .findings { padding: 64px 24px; background: #fff; }
+  .findings h2 { text-align: center; font-size: 1.8rem; color: var(--navy); margin-bottom: 8px; }
+  .findings .sub { text-align: center; color: var(--muted); margin-bottom: 40px; }
+  .findings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 1100px; margin: 0 auto; }
+  .finding-card { border-radius: 12px; padding: 28px; border-left: 5px solid; }
+  .finding-card.red { border-color: #DC2626; background: #FEF2F2; }
+  .finding-card.amber { border-color: #D97706; background: #FFFBEB; }
+  .finding-card.blue { border-color: var(--steel); background: #EFF6FF; }
+  .finding-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
+  .finding-card p { font-size: 0.92rem; color: var(--text); line-height: 1.6; }
+
+  /* PLATFORMS */
+  .platforms { padding: 64px 24px; background: var(--bg); }
+  .platforms h2 { text-align: center; font-size: 1.8rem; color: var(--navy); margin-bottom: 40px; }
+  .plat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
+  .plat-card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); border-top: 5px solid; }
+  .plat-card.yt { border-color: var(--yt); }
+  .plat-card.rd { border-color: var(--rd); }
+  .plat-card.tk { border-color: #555; }
+  .plat-card.mt { border-color: var(--mt); }
+  .plat-card h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 6px; }
+  .plat-card .score { font-size: 2rem; font-weight: 900; margin: 8px 0 4px; }
+  .plat-card .score-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .plat-card p { font-size: 0.88rem; color: var(--muted); }
+  .plat-card .unique { margin-top: 10px; font-size: 0.82rem; background: var(--bg); padding: 8px 10px; border-radius: 6px; color: var(--text); font-weight: 600; }
+
+  /* MATRIX */
+  .matrix-section { padding: 64px 24px; background: #fff; }
+  .matrix-section h2 { text-align: center; font-size: 1.8rem; color: var(--navy); margin-bottom: 8px; }
+  .matrix-section .sub { text-align: center; color: var(--muted); margin-bottom: 32px; }
+  .matrix-wrap { overflow-x: auto; max-width: 1100px; margin: 0 auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th { background: var(--navy); color: #fff; padding: 10px 14px; text-align: left; font-weight: 700; white-space: nowrap; }
+  th.plat-yt { background: var(--yt); }
+  th.plat-rd { background: var(--rd); }
+  th.plat-tk { background: #333; }
+  th.plat-mt { background: var(--mt); }
+  td { padding: 10px 14px; border-bottom: 1px solid #E2E8F0; }
+  tr:nth-child(even) td { background: #F8FAFC; }
+  .score-cell { text-align: center; font-weight: 700; border-radius: 4px; }
+  .s5,.s4 { background: #D1FAE5; color: #065F46; }
+  .s3 { background: #FEF3C7; color: #92400E; }
+  .s2,.s1 { background: #FEE2E2; color: #991B1B; }
+  .align-strong { color: var(--green); font-weight: 700; }
+  .align-mod { color: var(--amber); font-weight: 700; }
+  .align-div { color: var(--red); font-weight: 700; }
+
+  /* GAPS */
+  .gaps-section { padding: 64px 24px; background: var(--bg); }
+  .gaps-section h2 { text-align: center; font-size: 1.8rem; color: var(--navy); margin-bottom: 8px; }
+  .gaps-section .sub { text-align: center; color: var(--muted); margin-bottom: 36px; }
+  .gaps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; max-width: 1100px; margin: 0 auto; }
+  .gap-card { background: #fff; border-radius: 10px; padding: 18px 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-left: 4px solid; }
+  .gap-card.high { border-color: #DC2626; }
+  .gap-card.medium { border-color: #D97706; }
+  .gap-card.low { border-color: #16A34A; }
+  .gap-card .gap-id { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .gap-card.high .gap-id { color: #DC2626; }
+  .gap-card.medium .gap-id { color: #D97706; }
+  .gap-card.low .gap-id { color: #16A34A; }
+  .gap-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+  .gap-card p { font-size: 0.84rem; color: var(--muted); line-height: 1.5; }
+
+  /* FILES */
+  .files-section { padding: 64px 24px; background: #fff; }
+  .files-section h2 { text-align: center; font-size: 1.8rem; color: var(--navy); margin-bottom: 40px; }
+  .files-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; }
+  .file-card { border: 1px solid #E2E8F0; border-radius: 10px; padding: 22px; background: var(--bg); }
+  .file-card .file-icon { font-size: 2rem; margin-bottom: 10px; }
+  .file-card h4 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .file-card p { font-size: 0.85rem; color: var(--muted); }
+
+  /* FOOTER */
+  footer { background: var(--navy); color: rgba(255,255,255,0.7); text-align: center; padding: 32px 24px; font-size: 0.85rem; line-height: 1.7; }
+  footer a { color: rgba(255,255,255,0.9); }
+
+  @media (max-width: 600px) {
+    .hero { padding: 48px 16px 40px; }
+    .hero-links { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>PolicyMap</h1>
+  <p class="sub">A Cross-Platform Community Guidelines Audit for Trust &amp; Safety Professionals — YouTube · Reddit · TikTok · Meta/Instagram</p>
+  <div class="badges">
+    <span class="badge">📋 12 Content Categories</span>
+    <span class="badge">🔍 23 Documented Gaps</span>
+    <span class="badge">📄 Primary Sources Only</span>
+    <span class="badge">📅 May 2025</span>
+    <span class="badge">v1.0</span>
+  </div>
+  <div class="hero-links">
+    <a href="PolicyMap_ViolenceDecisionTree.html" class="btn btn-primary">🌳 Open Decision Tree</a>
+    <a href="PolicyMap_Report_v1.0.docx" class="btn btn-secondary">📄 Download Report</a>
+    <a href="PolicyMap_Audit_Matrix.xlsx" class="btn btn-secondary">📊 Download Matrix</a>
+  </div>
+</div>
+
+<!-- THREE HEADLINE FINDINGS -->
+<div class="findings">
+  <h2>Three Headline Findings</h2>
+  <p class="sub">Every finding is sourced from primary platform policy documents. No secondary sources were used.</p>
+  <div class="findings-grid">
+    <div class="finding-card red">
+      <h3>🔴 TikTok's FYF De-amplification Is a Structural Innovation With No Cross-Platform Equivalent</h3>
+      <p>TikTok is the only platform that explicitly documents a mid-tier enforcement action between "removal" and "allow." Content can exist on the platform and be effectively invisible to most users. The question for moderators is no longer just "should this be removed?" — it's also "should this be algorithmically suppressed even if it stays up?" No other platform has a documented answer to that second question.</p>
+    </div>
+    <div class="finding-card amber">
+      <h3>🟡 Reddit Has a Documented Site-Wide Policy Absence on Misinformation</h3>
+      <p>Reddit's Content Policy has no standalone misinformation policy. False health claims and election falsehoods are not explicitly prohibited at the platform level — confirmed by Reddit's own regulatory compliance filings under New York S895B (2025). This is unique among major platforms and has no equivalent on YouTube, TikTok, or Meta.</p>
+    </div>
+    <div class="finding-card blue">
+      <h3>🔵 Meta's January 2025 Changes Introduced Documented LGBTQ+ Protection Rollbacks</h3>
+      <p>Meta's updated Hateful Conduct policy now explicitly permits content alleging mental illness or abnormality based on gender or sexual orientation. This is documented in Meta's own January 2025 Change Log — not a rumour or third-party claim. Content that may be removed on TikTok or YouTube may now be explicitly permitted under Meta's current policy.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PLATFORM PROFILES -->
+<div class="platforms">
+  <h2>Platform Profiles</h2>
+  <div class="plat-grid">
+    <div class="plat-card yt">
+      <h3>🎬 YouTube</h3>
+      <div class="score">4.3</div>
+      <div class="score-label">Avg Specificity Score (of 5)</div>
+      <p>Covers 12/12 categories. Highest specificity average of any platform. Zero Score-1 categories.</p>
+      <div class="unique">⭐ EDSA exception framework — most formally articulated contextual exception of any platform</div>
+    </div>
+    <div class="plat-card rd">
+      <h3>🟠 Reddit</h3>
+      <div class="score" style="color:#DC2626;">2.5</div>
+      <div class="score-label">Avg Specificity Score (of 5)</div>
+      <p>Covers 10/12 categories. Lowest specificity average. Two Score-1 categories (health &amp; election misinformation).</p>
+      <div class="unique">⚠️ Two-tier governance creates widest policy variability of any platform</div>
+    </div>
+    <div class="plat-card tk">
+      <h3>🎵 TikTok</h3>
+      <div class="score" style="color:#D97706;">3.2</div>
+      <div class="score-label">Avg Specificity Score (of 5)</div>
+      <p>Covers 12/12 categories. Consistent Score 3 across nine categories. Zero Score-1 categories.</p>
+      <div class="unique">⭐ FYF Ineligibility — unique documented mid-tier de-amplification enforcement action</div>
+    </div>
+    <div class="plat-card mt">
+      <h3>📘 Meta / Instagram</h3>
+      <div class="score">4.1</div>
+      <div class="score-label">Avg Specificity Score (of 5)</div>
+      <p>Covers 12/12 categories. Second-highest specificity average. Most detailed hate speech framework.</p>
+      <div class="unique">⭐ External Oversight Board — only platform with independent binding appeals</div>
+    </div>
+  </div>
+</div>
+
+<!-- MATRIX -->
+<div class="matrix-section">
+  <h2>Specificity Score Matrix</h2>
+  <p class="sub">Scores 1–5. Green = Strong (4–5) · Yellow = Adequate (3) · Red = Weak or Absent (1–2)</p>
+  <div class="matrix-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Content Category</th>
+          <th class="plat-yt">YouTube</th>
+          <th class="plat-rd">Reddit</th>
+          <th class="plat-tk">TikTok</th>
+          <th class="plat-mt">Meta/IG</th>
+          <th>Alignment</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Graphic Violence: News Context</td><td class="score-cell s5">5</td><td class="score-cell s3">3</td><td class="score-cell s3">3</td><td class="score-cell s5">5</td><td class="align-mod">Moderate</td></tr>
+        <tr><td>Graphic Violence: Fictional</td><td class="score-cell s4">4</td><td class="score-cell s2">2</td><td class="score-cell s3">3</td><td class="score-cell s4">4</td><td class="align-mod">Moderate</td></tr>
+        <tr><td>Sexual Content: Adult</td><td class="score-cell s4">4</td><td class="score-cell s2">2</td><td class="score-cell s3">3</td><td class="score-cell s4">4</td><td class="align-mod">Moderate</td></tr>
+        <tr><td>Sexual Content: Minors (CSAM)</td><td class="score-cell s5">5</td><td class="score-cell s5">5</td><td class="score-cell s5">5</td><td class="score-cell s5">5</td><td class="align-strong">Strong ✓</td></tr>
+        <tr><td>Hate Speech: Race/Ethnicity</td><td class="score-cell s5">5</td><td class="score-cell s3">3</td><td class="score-cell s3">3</td><td class="score-cell s5">5</td><td class="align-mod">Moderate</td></tr>
+        <tr><td>Hate Speech: Gender/Sexuality</td><td class="score-cell s4">4</td><td class="score-cell s3">3</td><td class="score-cell s3">3</td><td class="score-cell s4">4</td><td class="align-mod">Moderate</td></tr>
+        <tr><td>Misinformation: Health</td><td class="score-cell s4">4</td><td class="score-cell s1">1</td><td class="score-cell s3">3</td><td class="score-cell s3">3</td><td class="align-div">Divergent ✗</td></tr>
+        <tr><td>Misinformation: Elections</td><td class="score-cell s3">3</td><td class="score-cell s1">1</td><td class="score-cell s3">3</td><td class="score-cell s3">3</td><td class="align-div">Divergent ✗</td></tr>
+        <tr><td>Harassment &amp; Doxxing</td><td class="score-cell s5">5</td><td class="score-cell s3">3</td><td class="score-cell s3">3</td><td class="score-cell s5">5</td><td class="align-mod">Moderate</td></tr>
+        <tr><td>Self-Harm &amp; Suicide</td><td class="score-cell s5">5</td><td class="score-cell s3">3</td><td class="score-cell s3">3</td><td class="score-cell s4">4</td><td class="align-mod">Moderate</td></tr>
+        <tr><td>Dangerous Activities</td><td class="score-cell s4">4</td><td class="score-cell s2">2</td><td class="score-cell s3">3</td><td class="score-cell s3">3</td><td class="align-mod">Moderate</td></tr>
+        <tr><td>Violent Extremism</td><td class="score-cell s5">5</td><td class="score-cell s3">3</td><td class="score-cell s4">4</td><td class="score-cell s5">5</td><td class="align-strong">Strong ✓</td></tr>
+        <tr style="font-weight:700;background:#EFF6FF;"><td><strong>Average</strong></td><td class="score-cell s5">4.3</td><td class="score-cell s2">2.5</td><td class="score-cell s3">3.2</td><td class="score-cell s4">4.1</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- GAPS -->
+<div class="gaps-section">
+  <h2>23 Documented Policy Gaps</h2>
+  <p class="sub">Each gap is documented with verbatim policy quotes, a real-world scenario, harm potential, and a harmonisation recommendation. Full detail in the Gap Register spreadsheet.</p>
+  <div class="gaps-grid">
+    <div class="gap-card high"><div class="gap-id">GAP-001 · HIGH</div><h4>Educational Violence Threshold</h4><p>Same war footage: YouTube age-gates with narration present. TikTok removes regardless of context.</p></div>
+    <div class="gap-card high"><div class="gap-id">GAP-002 · HIGH</div><h4>Slur Reclamation Standard</h4><p>Meta explicitly allows self-referential slur use. TikTok has no documented exception for reclaimed language.</p></div>
+    <div class="gap-card high"><div class="gap-id">GAP-003 · HIGH</div><h4>FYF De-amplification vs. Removal</h4><p>TikTok's mid-tier enforcement (de-amplify without removal) has no equivalent documented on any other platform.</p></div>
+    <div class="gap-card high"><div class="gap-id">GAP-004 · HIGH</div><h4>Misinformation Vacuum on Reddit</h4><p>Reddit's site-wide Content Policy has no standalone misinformation policy. Confirmed by Reddit's own regulatory filings.</p></div>
+    <div class="gap-card high"><div class="gap-id">GAP-005 · HIGH</div><h4>Oversight Mechanism Gap</h4><p>Meta has an external Oversight Board with binding authority. YouTube, TikTok, Reddit: platform is final decision-maker.</p></div>
+    <div class="gap-card high"><div class="gap-id">GAP-006 · HIGH</div><h4>Newsworthiness Transparency</h4><p>Meta publishes data on exception invocations (32 in 1 year). YouTube, TikTok, Reddit: zero disclosure.</p></div>
+    <div class="gap-card high"><div class="gap-id">GAP-007 · HIGH</div><h4>Regional Content Modulation</h4><p>TikTok explicitly documents regional suppression with no creator notification. No other platform documents this.</p></div>
+    <div class="gap-card high"><div class="gap-id">GAP-008 · HIGH</div><h4>Safe Messaging Guidelines</h4><p>YouTube and Meta explicitly reference clinical Safe Messaging Guidelines. TikTok and Reddit do not name them in primary policy.</p></div>
+    <div class="gap-card medium"><div class="gap-id">GAP-009 · MEDIUM</div><h4>Strike System Differences</h4><p>YouTube: formal 3-strike system. Reddit: no site-wide strikes. TikTok: tier-based warnings. Meta: not documented publicly.</p></div>
+    <div class="gap-card medium"><div class="gap-id">GAP-010 · MEDIUM</div><h4>Public Figure Exception Thresholds</h4><p>Different tests for political satire across platforms produce different outcomes for borderline content.</p></div>
+    <div class="gap-card medium"><div class="gap-id">GAP-011 · MEDIUM</div><h4>Animal Cruelty Exceptions</h4><p>YouTube enumerates specific exceptions (hunting, food). TikTok does not enumerate equivalent exceptions.</p></div>
+    <div class="gap-card medium"><div class="gap-id">GAP-012 · MEDIUM</div><h4>Coordinated Inauthentic Behaviour</h4><p>Meta and TikTok have named CIB policies. Reddit's "content manipulation" rule is broader and less specific.</p></div>
+    <div class="gap-card medium"><div class="gap-id">GAP-013 · MEDIUM</div><h4>Glorification vs. Discussion</h4><p>Four different operational tests for "glorification." Same moderator decision, four different policy anchors.</p></div>
+    <div class="gap-card medium"><div class="gap-id">GAP-014 · MEDIUM</div><h4>Dangerous Challenges Threshold</h4><p>YouTube: "imminent risk of injury." TikTok: "could lead to harm." Legally and operationally significant threshold difference.</p></div>
+    <div class="gap-card medium"><div class="gap-id">GAP-015 · MEDIUM</div><h4>Off-Platform Behaviour</h4><p>TikTok explicitly documents off-platform conduct review. YouTube and Reddit do not.</p></div>
+    <div class="gap-card medium"><div class="gap-id">GAP-016 · MEDIUM</div><h4>Satire Exception Documentation</h4><p>Meta has an explicit named satire exception. TikTok has no equivalent named exception in its Community Guidelines.</p></div>
+    <div class="gap-card medium"><div class="gap-id">GAP-017 · MEDIUM</div><h4>Historical Documentation Exception</h4><p>Reddit explicitly names historical documentation as an exception. TikTok does not.</p></div>
+    <div class="gap-card medium"><div class="gap-id">GAP-018 · MEDIUM</div><h4>Operator/Creator/User Liability Chain</h4><p>YouTube documents a three-tier responsibility chain. TikTok and Meta do not document equivalent creator liability distinctions.</p></div>
+    <div class="gap-card low"><div class="gap-id">GAP-019 · LOW</div><h4>Terminology Differences</h4><p>Four different labels for the same hate speech category across four platforms.</p></div>
+    <div class="gap-card low"><div class="gap-id">GAP-020 · LOW</div><h4>Appeal Timeline Documentation</h4><p>No platform publishes specific per-case appeal timeline commitments.</p></div>
+    <div class="gap-card low"><div class="gap-id">GAP-021 · LOW</div><h4>Community Warning Labels</h4><p>Reddit's NSFW system gives users active consent control. TikTok's age-restriction is binary with no equivalent label.</p></div>
+    <div class="gap-card low"><div class="gap-id">GAP-022 · LOW</div><h4>Context Burden Allocation</h4><p>YouTube places context burden on creators. TikTok places it on moderators. Different allocation, different outcomes.</p></div>
+    <div class="gap-card low"><div class="gap-id">GAP-023 · LOW</div><h4>Transparency Reporting Granularity</h4><p>Meta: quarterly category-level data. Reddit: least granular of the four. Makes cross-platform research significantly harder.</p></div>
+  </div>
+</div>
+
+<!-- FILES -->
+<div class="files-section">
+  <h2>Deliverable Files</h2>
+  <div class="files-grid">
+    <div class="file-card">
+      <div class="file-icon">📄</div>
+      <h4>PolicyMap_Report_v1.0.docx</h4>
+      <p>Full structured report — Executive Summary, Methodology, 4 Platform Profiles, Cross-Platform Matrix, 23-gap Gap Analysis, 4 Recommendations, Appendices A/B/C. ~10,000 words.</p>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">📊</div>
+      <h4>PolicyMap_Audit_Matrix.xlsx</h4>
+      <p>3-tab spreadsheet: Master Matrix (48 cells, source URLs, verbatim quotes), Gap Register (23 gaps, full detail), Platform Profiles (aggregate scores, unique features).</p>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">🌳</div>
+      <h4>PolicyMap_ViolenceDecisionTree.html</h4>
+      <p>Interactive 6-node YES/NO decision flowchart for evaluating real-world violent content across all four platforms. Printable to PDF.</p>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">🗒️</div>
+      <h4>research_notes/</h4>
+      <p>Raw research notes for each platform: verbatim policy quotes, structural analysis, specificity score rationale. Full audit trail.</p>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">📎</div>
+      <h4>sources/sources_master_list.csv</h4>
+      <p>All 34 primary source URLs: platform, policy category, access date (May 2025), report section mapping.</p>
+    </div>
+    <div class="file-card">
+      <div class="file-icon">💬</div>
+      <h4>sources/policy_excerpts.md</h4>
+      <p>Curated verbatim quotes from all four platforms, organised by category — the key quotes that anchor every major finding.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p><strong>PolicyMap</strong> — Cross-Platform Community Guidelines Audit | Version 1.0 | May 2025</p>
+  <p>Independent academic analysis. Not affiliated with or endorsed by YouTube, Reddit, TikTok, or Meta.</p>
+  <p>All policy citations are from primary platform policy documents accessed May 2025. Verify currency before operational use.</p>
+</footer>
+
+</body>
+</html>

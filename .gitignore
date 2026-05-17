@@ -1,0 +1,29 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temp files
+*.tmp
+*.temp
+~$*
+
+# Build artifacts
+node_modules/
+__pycache__/
+*.pyc
+
+# Personal notes (not for repo)
+personal_notes.md
+scratch.md
+draft_*.md
+
+# Large binary exports (keep originals, not exports)
+*_export.pdf

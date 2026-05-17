@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PolicyMap Decision Tree: Evaluating Violent Content Across Four Platforms</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', Arial, sans-serif;
+    background: #f8fafc;
+    color: #1e293b;
+    padding: 24px;
+    min-width: 1100px;
+  }
+
+  /* ── HEADER ─────────────────────────────────────────────────── */
+  .page-header {
+    background: linear-gradient(135deg, #1F3864 0%, #2C4770 100%);
+    color: #fff;
+    border-radius: 12px;
+    padding: 28px 36px 24px;
+    margin-bottom: 28px;
+    box-shadow: 0 4px 20px rgba(31,56,100,0.25);
+  }
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+  }
+  .page-header p {
+    font-size: 13px;
+    opacity: 0.82;
+    line-height: 1.5;
+  }
+  .page-header .meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .page-header .meta span {
+    font-size: 11.5px;
+    background: rgba(255,255,255,0.15);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  /* ── LEGEND ─────────────────────────────────────────────────── */
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    padding: 14px 20px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .legend-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* ── FLOWCHART CONTAINER ─────────────────────────────────────── */
+  .flowchart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* ── NODE TYPES ─────────────────────────────────────────────── */
+  .node {
+    position: relative;
+    border-radius: 10px;
+    padding: 16px 22px;
+    text-align: center;
+    font-weight: 600;
+    line-height: 1.4;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.10);
+    cursor: default;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .node:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+  }
+
+  .node-start {
+    background: linear-gradient(135deg, #1F3864, #2C5F9E);
+    color: #fff;
+    font-size: 14.5px;
+    font-weight: 700;
+    width: 600px;
+    padding: 20px 28px;
+    border-radius: 50px;
+    box-shadow: 0 4px 16px rgba(31,56,100,0.35);
+  }
+  .node-start .subtext {
+    font-size: 11.5px;
+    font-weight: 500;
+    opacity: 0.85;
+    margin-top: 5px;
+  }
+
+  .node-question {
+    background: #fff;
+    border: 2.5px solid #2C4770;
+    color: #1F3864;
+    font-size: 14px;
+    width: 560px;
+    border-radius: 10px;
+  }
+  .node-question .q-num {
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 5px;
+  }
+  .node-question strong { color: #0f172a; }
+
+  /* Terminal node colours */
+  .node-remove {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: #fff;
+    font-size: 13px;
+  }
+  .node-restrict {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    color: #fff;
+    font-size: 13px;
+  }
+  .node-review {
+    background: linear-gradient(135deg, #4b5563, #374151);
+    color: #fff;
+    font-size: 13px;
+  }
+  .node-platform {
+    background: linear-gradient(135deg, #0369a1, #0284c7);
+    color: #fff;
+    font-size: 13px;
+    text-align: left;
+    width: 560px;
+  }
+  .node-end {
+    background: linear-gradient(135deg, #166534, #15803d);
+    color: #fff;
+    font-size: 13.5px;
+    font-weight: 700;
+    width: 500px;
+    border-radius: 50px;
+    padding: 16px 28px;
+  }
+
+  /* ── CONNECTORS ─────────────────────────────────────────────── */
+  .connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+  }
+  .arrow-down {
+    width: 2px;
+    height: 28px;
+    background: #64748b;
+    position: relative;
+  }
+  .arrow-down::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #64748b;
+  }
+
+  .branch-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    gap: 0;
+    position: relative;
+  }
+
+  /* YES/NO labels */
+  .yn-label {
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    margin: 3px 0;
+  }
+  .yn-yes { background: #fee2e2; color: #dc2626; }
+  .yn-no  { background: #dcfce7; color: #166534; }
+
+  /* ── BRANCH BLOCK ────────────────────────────────────────────── */
+  .branch-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+  }
+  .branch-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 260px;
+    max-width: 340px;
+  }
+  .branch-side .branch-label-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin-bottom: 4px;
+  }
+
+  /* ── PLATFORM SPLIT BOX ──────────────────────────────────────── */
+  .platform-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 760px;
+    margin: 0 auto;
+  }
+  .platform-card {
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+  .platform-card .plat-header {
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1.5px solid rgba(255,255,255,0.3);
+  }
+  .plat-yt   { background: #dc2626; color: #fff; }
+  .plat-tk   { background: #18181b; color: #fff; }
+  .plat-rd   { background: #ea580c; color: #fff; }
+  .plat-mt   { background: #1d4ed8; color: #fff; }
+
+  /* ── H-LINE ──────────────────────────────────────────────────── */
+  .h-line-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    position: relative;
+    margin: 0;
+  }
+
+  /* ── SECTION DIVIDER ─────────────────────────────────────────── */
+  .section-note {
+    font-size: 11px;
+    color: #64748b;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 14px;
+    margin: 6px 0;
+    font-style: italic;
+  }
+
+  /* ── POLICY CITATIONS ────────────────────────────────────────── */
+  .citations {
+    margin-top: 32px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px 28px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .citations h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1F3864;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  .cite-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 28px;
+  }
+  .cite-item {
+    font-size: 11.5px;
+    color: #374151;
+    line-height: 1.5;
+  }
+  .cite-item strong { color: #1F3864; }
+  .cite-item a { color: #0369a1; text-decoration: none; }
+  .cite-item a:hover { text-decoration: underline; }
+
+  /* ── FOOTER NOTE ─────────────────────────────────────────────── */
+  .footer-note {
+    margin-top: 20px;
+    font-size: 11px;
+    color: #94a3b8;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  /* Print styles */
+  @media print {
+    body { background: #fff; padding: 12px; }
+    .node:hover { transform: none; box-shadow: 0 2px 10px rgba(0,0,0,0.10); }
+  }
+
+  /* ── VERTICAL FLOW HELPERS ───────────────────────────────────── */
+  .flow-step { display: flex; flex-direction: column; align-items: center; width: 100%; }
+  .spacer-sm { height: 8px; }
+  .spacer-md { height: 16px; }
+
+  /* Inline YES path (to the right) */
+  .yes-inline {
+    display: flex;
+    align-items: flex-start;
+    width: 920px;
+    gap: 0;
+    position: relative;
+  }
+  .yes-inline .main-path {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  }
+  .yes-inline .side-path {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 280px;
+  }
+  .h-branch {
+    height: 2px;
+    background: #64748b;
+    flex: 1;
+    margin-top: 40px;
+  }
+  .side-arrow-down {
+    width: 2px;
+    height: 20px;
+    background: #64748b;
+    position: relative;
+  }
+  .side-arrow-down::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid #64748b;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-header">
+  <h1>PolicyMap Decision Tree: Evaluating Violent Content Across Four Platforms</h1>
+  <p>A structured decision framework for Trust &amp; Safety professionals reviewing real-world violent content.<br>
+     Every node is YES/NO only. Every terminal node states an action. Colour coding: 🔴 Remove · 🟠 Restrict · ⬛ Human Review · 🔵 Platform-specific action · 🟢 Document &amp; close.</p>
+  <div class="meta">
+    <span>📋 Scenario: Real-world violent video submitted for review</span>
+    <span>📅 Policy sources: May 2025</span>
+    <span>🔍 Primary sources only — no secondary summaries</span>
+    <span>📄 Companion: PolicyMap_Report_v1.0.docx | PolicyMap_Audit_Matrix.xlsx</span>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#dc2626;"></div> REMOVE — content violates policy, removal required on all platforms</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#d97706;"></div> RESTRICT — age-gate, warning screen, or FYF restriction applied</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#374151;"></div> HUMAN REVIEW — automated decision insufficient, escalate</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#0369a1;"></div> PLATFORM-SPECIFIC — outcome differs by platform, see node</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#166534;"></div> DOCUMENT — decision made, log rationale and close</div>
+</div>
+
+<!-- FLOWCHART -->
+<div class="flowchart">
+
+  <!-- START -->
+  <div class="flow-step">
+    <div class="node node-start">
+      START: A video contains real-world violence or graphic content. What do you do?
+      <div class="subtext">Begin at Node 1 and follow YES/NO paths. Every path leads to a documented action.</div>
+    </div>
+    <div class="arrow-down" style="height:32px;"></div>
+  </div>
+
+  <!-- NODE 1 -->
+  <div class="flow-step">
+    <div class="node node-question" style="width:580px;">
+      <div class="q-num">Node 1</div>
+      <strong>Does the content depict minors being harmed, sexually exploited, or killed?</strong>
+      <div style="font-size:11.5px;color:#64748b;margin-top:5px;">Includes imagery, audio, or text describing harm to any person under 18.</div>
+    </div>
+  </div>
+
+  <!-- NODE 1 BRANCH -->
+  <div class="branch-container" style="margin-top:4px;">
+    <!-- YES LEFT -->
+    <div class="branch-side">
+      <div class="branch-label-row">
+        <div class="arrow-down" style="height:18px;"></div>
+        <span class="yn-label yn-yes">YES →</span>
+        <div class="arrow-down" style="height:14px;"></div>
+      </div>
+      <div class="node node-remove" style="width:300px;">
+        🚫 IMMEDIATE REMOVAL — ALL PLATFORMS<br>
+        <span style="font-size:11.5px;font-weight:500;opacity:0.9;">Report to NCMEC (legal obligation for all 4 platforms). Contact law enforcement if credible imminent threat. No EDSA/context exception applies to CSAM on any platform. End.</span>
+      </div>
+      <div class="spacer-sm"></div>
+      <div class="section-note">Policy anchors: YouTube answer/2801999 · Reddit HC articles/360008810092 · TikTok community-guidelines/en/safety-civility · Meta CS/child-sexual-exploitation-abuse-nudity</div>
+    </div>
+    <!-- DIVIDER -->
+    <div style="width:40px;display:flex;flex-direction:column;align-items:center;padding-top:30px;">
+      <div style="width:1px;height:100%;background:#e2e8f0;"></div>
+    </div>
+    <!-- NO RIGHT → CONTINUES -->
+    <div class="branch-side">
+      <div class="branch-label-row">
+        <div class="arrow-down" style="height:18px;"></div>
+        <span class="yn-label yn-no">NO → Continue to Node 2</span>
+        <div class="arrow-down" style="height:14px;"></div>
+      </div>
+      <div class="node node-question" style="width:300px;font-size:13px;">
+        <div class="q-num">Node 2</div>
+        <strong>Does the content glorify, celebrate, instruct, or incite the viewer to commit violence?</strong>
+        <div style="font-size:11px;color:#64748b;margin-top:4px;">Does it praise perpetrators, share their manifesto, or frame violence as heroic or desirable?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NODE 2 BRANCH -->
+  <div class="branch-container" style="margin-top:12px;">
+    <div class="branch-side" style="min-width:300px;">
+      <div class="branch-label-row">
+        <span class="yn-label yn-yes">YES →</span>
+        <div class="arrow-down" style="height:14px;"></div>
+      </div>
+      <div class="node node-remove" style="width:300px;">
+        🚫 REMOVAL — ALL PLATFORMS<br>
+        <span style="font-size:11.5px;font-weight:500;opacity:0.9;">No contextual exceptions apply to content that glorifies or incites violence. End.<br><br>
+        YT: "content encouraging others to commit violent acts" — answer/2802008<br>
+        Reddit: "encourages, glorifies, incites, or calls for violence" — HCA/360043513151<br>
+        TikTok: "glorifying violence" — CG/safety-civility<br>
+        Meta: "celebrates the suffering or humiliation of others" — CS/violent-graphic-content</span>
+      </div>
+    </div>
+    <div style="width:40px;"></div>
+    <div class="branch-side" style="min-width:300px;">
+      <div class="branch-label-row">
+        <span class="yn-label yn-no">NO → Continue to Node 3</span>
+        <div class="arrow-down" style="height:14px;"></div>
+      </div>
+      <div class="node node-question" style="width:300px;font-size:13px;">
+        <div class="q-num">Node 3</div>
+        <strong>Was this footage filmed by the perpetrator of the violent event?</strong>
+        <div style="font-size:11px;color:#64748b;margin-top:4px;">"Perpetrator footage" = filmed by the person committing the violence, not bystanders or journalists.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NODE 3 BRANCH -->
+  <div class="branch-container" style="margin-top:12px;">
+    <div class="branch-side" style="min-width:300px;">
+      <div class="branch-label-row">
+        <span class="yn-label yn-yes">YES →</span>
+        <div class="arrow-down" style="height:14px;"></div>
+      </div>
+      <div class="node node-remove" style="width:300px;">
+        🚫 REMOVAL — YOUTUBE (absolute rule)<br>
+        ⬛ LIKELY REMOVAL — TikTok &amp; Meta<br>
+        🟠 SUBREDDIT-DEPENDENT — Reddit<br>
+        <span style="font-size:11px;font-weight:500;opacity:0.9;display:block;margin-top:6px;">YouTube: "Footage filmed by the perpetrator during a deadly or major violent event...is NOT allowed even with EDSA context" — answer/6345162. This is YouTube's hardest rule. End.</span>
+      </div>
+    </div>
+    <div style="width:40px;"></div>
+    <div class="branch-side" style="min-width:300px;">
+      <div class="branch-label-row">
+        <span class="yn-label yn-no">NO → Continue to Node 4</span>
+        <div class="arrow-down" style="height:14px;"></div>
+      </div>
+      <div class="node node-question" style="width:300px;font-size:13px;">
+        <div class="q-num">Node 4</div>
+        <strong>Is journalistic, educational, or documentary context present IN the video itself — not only in the title or description?</strong>
+        <div style="font-size:11px;color:#64748b;margin-top:4px;">Context = narration, text overlay, on-screen captions explaining who/what/when/why. Description-only context DOES NOT qualify on YouTube (highest-risk categories).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NODE 4 BRANCH -->
+  <div class="branch-container" style="margin-top:12px;">
+    <div class="branch-side" style="min-width:300px;">
+      <div class="branch-label-row">
+        <span class="yn-label yn-no">NO — no in-video context →</span>
+        <div class="arrow-down" style="height:14px;"></div>
+      </div>
+      <div class="node node-review" style="width:300px;">
+        ⬛ PLATFORM-SPECIFIC — No in-video context<br>
+        <span style="font-size:11.5px;font-weight:500;opacity:0.9;display:block;margin-top:6px;">
+          🔴 YouTube: REMOVE or AGE-GATE (without in-video context, EDSA exception unlikely for high-risk categories)<br><br>
+          🔴 TikTok: LIKELY REMOVE (no news exception documented without in-video public-interest framing)<br><br>
+          🟠 Reddit: NSFW label option IF subreddit rules allow; else REMOVE<br><br>
+          🟠 Meta: REMOVE or WARNING SCREEN — graphic content requires context to be shared to "raise awareness"<br><br>
+          Action: Request creator re-post with in-video narration or contextual overlay. End.
+        </span>
+      </div>
+    </div>
+    <div style="width:40px;"></div>
+    <div class="branch-side" style="min-width:300px;">
+      <div class="branch-label-row">
+        <span class="yn-label yn-yes">YES — context is in the video →</span>
+        <div class="arrow-down" style="height:14px;"></div>
+      </div>
+      <div class="node node-question" style="width:300px;font-size:13px;">
+        <div class="q-num">Node 5</div>
+        <strong>Is the violence depicted gratuitously — does it dwell on, linger on, or celebrate suffering beyond what the editorial purpose requires?</strong>
+        <div style="font-size:11px;color:#64748b;margin-top:4px;">"Gratuitous" = slow-motion replays of death, zooming in on injuries, reactions that frame violence approvingly. Not the same as graphic — context is about framing, not pixel content.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NODE 5 BRANCH -->
+  <div class="branch-container" style="margin-top:12px;">
+    <div class="branch-side" style="min-width:300px;">
+      <div class="branch-label-row">
+        <span class="yn-label yn-yes">YES — gratuitous →</span>
+        <div class="arrow-down" style="height:14px;"></div>
+      </div>
+      <div class="node node-remove" style="width:300px;">
+        🚫 REMOVAL — ALL PLATFORMS<br>
+        <span style="font-size:11.5px;font-weight:500;opacity:0.9;display:block;margin-top:6px;">EDSA exceptions require that suffering not be presented gratuitously. Content meant to "shock or disgust" is not saved by having a news label.<br><br>
+        YouTube: "intent to shock or disgust viewers" — answer/2802008<br>
+        Meta: "glorifies violence or celebrates the suffering or humiliation of others" — CS/violent-graphic-content. End.</span>
+      </div>
+    </div>
+    <div style="width:40px;"></div>
+    <div class="branch-side" style="min-width:300px;">
+      <div class="branch-label-row">
+        <span class="yn-label yn-no">NO — editorial framing present →</span>
+        <div class="arrow-down" style="height:14px;"></div>
+      </div>
+      <div class="node node-question" style="width:300px;font-size:13px;">
+        <div class="q-num">Node 6</div>
+        <strong>Which platform are you moderating?</strong>
+        <div style="font-size:11px;color:#64748b;margin-top:4px;">Platform-specific rules now apply. Content has passed all universal filters. See platform cards below.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NODE 6 PLATFORM SPLIT -->
+  <div class="flow-step" style="margin-top:18px;">
+    <div class="arrow-down" style="height:16px; margin-left:240px;"></div>
+    <div class="platform-split">
+
+      <div class="platform-card plat-yt">
+        <div class="plat-header">🎬 YouTube</div>
+        <strong>Apply EDSA Evaluation:</strong><br>
+        1. Is context in the video/audio? (confirmed YES at Node 4)<br>
+        2. Is content from an active warzone, humanitarian crisis, or major civil event?<br>
+        → If YES: <strong>AGE-GATE</strong> (not viewable under 18 or signed out)<br>
+        → May also add warning screen<br>
+        → If sufficient public interest: <strong>ALLOW with age restriction</strong><br><br>
+        <em style="font-size:11px;opacity:0.85;">Source: support.google.com/youtube/answer/2802008 — "We may allow or age-restrict graphic or violent content documenting warzones, civil unrest, humanitarian crises...with adequate educational, documentary, scientific or artistic context."</em>
+      </div>
+
+      <div class="platform-card plat-tk">
+        <div class="plat-header">🎵 TikTok</div>
+        <strong>Two-decision process — removal AND FYF:</strong><br>
+        1. Does content meet explicit news/public-interest value? → May be <strong>AGE-RESTRICTED</strong> (18+)<br>
+        2. Even if not removed: evaluate for <strong>FYF ELIGIBILITY separately</strong> — borderline graphic content is FYF Ineligible even if kept on platform<br>
+        3. If unclear: <strong>HUMAN REVIEW</strong><br><br>
+        <em style="font-size:11px;opacity:0.85;">Source: tiktok.com/community-guidelines/en/overview — "Graphic footage of events...in the public interest to view, such as wars and major disasters [may be] age-restricted or FYF-ineligible." Note: TikTok's threshold is stricter than YouTube — graphic content defaults to removal without clear news value.</em>
+      </div>
+
+      <div class="platform-card plat-rd">
+        <div class="plat-header">🟠 Reddit</div>
+        <strong>Check subreddit rules FIRST:</strong><br>
+        1. Does the specific subreddit allow graphic content?<br>
+        2. Is NSFW label applied or required? → <strong>ALLOW WITH NSFW LABEL</strong> if subreddit permits<br>
+        3. Does content have public interest value (news reporting, historical documentation, citizen journalism) AND not mock victims or promote perpetrator? → <strong>ALLOW WITH NSFW LABEL</strong><br>
+        4. No label applied and subreddit does not allow graphic content? → <strong>FLAG FOR MOD</strong><br><br>
+        <em style="font-size:11px;opacity:0.85;">Source: support.reddithelp.com HCA/360043513151 — "We may allow appropriately labelled graphic content that has public interest value, such as legitimate news reporting, historical documentation, or citizen journalism."</em>
+      </div>
+
+      <div class="platform-card plat-mt">
+        <div class="plat-header">📘 Meta / Instagram</div>
+        <strong>Apply Newsworthiness Evaluation:</strong><br>
+        1. Is content shared to condemn, raise awareness, or provide news coverage? → Likely <strong>ALLOW WITH RESTRICTIONS</strong><br>
+        2. Could users under 18 see it? → Apply <strong>AGE-GATE</strong> (hidden from under-18s)<br>
+        3. Add <strong>WARNING SCREEN</strong> for users over 18 ("Graphic or violent content")<br>
+        4. Political/public figure content? Consider formal <strong>NEWSWORTHINESS ALLOWANCE</strong><br><br>
+        <em style="font-size:11px;opacity:0.85;">Source: transparency.meta.com/policies/community-standards/violent-graphic-content — "Graphic content shared to raise awareness about current events may be allowed but hidden from users under 18 with a warning screen."</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINAL NODE -->
+  <div class="flow-step" style="margin-top:20px;">
+    <div class="arrow-down" style="height:24px;"></div>
+    <div class="node node-end">
+      ✅ END: Document your decision and rationale in the review log.
+      <div style="font-size:12px;font-weight:500;opacity:0.88;margin-top:6px;">Record: platform, node path taken, policy anchors cited, action applied, timestamp. If escalated to human review, record reviewer ID and outcome.</div>
+    </div>
+  </div>
+
+  <!-- GAP CALLOUT -->
+  <div style="margin-top:28px;background:#fffbeb;border:1.5px solid #d97706;border-radius:10px;padding:18px 24px;max-width:920px;width:100%;">
+    <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:10px;">⚠️ Critical Cross-Platform Gap Documented in This Decision Tree (GAP-003 from PolicyMap Audit)</div>
+    <div style="font-size:12.5px;color:#78350f;line-height:1.6;">
+      <strong>Node 6 reveals a structural philosophical difference:</strong> On TikTok, the moderator must make <em>two separate decisions</em> — (1) should this be removed? and (2) should this be FYF-ineligible even if it stays up? On YouTube, Reddit, and Meta, the second question is not formally documented as a policy action. A moderator following YouTube, Reddit, or Meta policy has no documented framework for "allow but suppress algorithmically." On TikTok, the policy explicitly requires this two-step evaluation.<br><br>
+      This gap means: the same video that passes all removal tests on TikTok may <em>still</em> be effectively invisible to 95% of the platform's users — a fact the moderator is expected to account for but which no other platform's policy acknowledges as a distinct enforcement state.
+    </div>
+  </div>
+
+</div><!-- /flowchart -->
+
+<!-- POLICY CITATIONS -->
+<div class="citations">
+  <h3>Policy Sources Cited in This Decision Tree — All Accessed May 2025</h3>
+  <div class="cite-grid">
+    <div class="cite-item">
+      <strong>YouTube — Violent/Graphic Content:</strong><br>
+      <a href="https://support.google.com/youtube/answer/2802008">support.google.com/youtube/answer/2802008</a>
+    </div>
+    <div class="cite-item">
+      <strong>YouTube — EDSA Evaluation:</strong><br>
+      <a href="https://support.google.com/youtube/answer/6345162">support.google.com/youtube/answer/6345162</a>
+    </div>
+    <div class="cite-item">
+      <strong>YouTube — Child Safety:</strong><br>
+      <a href="https://support.google.com/youtube/answer/2801999">support.google.com/youtube/answer/2801999</a>
+    </div>
+    <div class="cite-item">
+      <strong>Reddit — Violent Content Policy:</strong><br>
+      <a href="https://support.reddithelp.com/hc/en-us/articles/360043513151">support.reddithelp.com/hc/en-us/articles/360043513151</a>
+    </div>
+    <div class="cite-item">
+      <strong>TikTok — Community Guidelines Overview:</strong><br>
+      <a href="https://www.tiktok.com/community-guidelines/en/overview">tiktok.com/community-guidelines/en/overview</a>
+    </div>
+    <div class="cite-item">
+      <strong>TikTok — Safety and Civility:</strong><br>
+      <a href="https://www.tiktok.com/community-guidelines/en/safety-civility">tiktok.com/community-guidelines/en/safety-civility</a>
+    </div>
+    <div class="cite-item">
+      <strong>TikTok — FYF Eligibility Standards:</strong><br>
+      <a href="https://www.tiktok.com/community-guidelines/en/fyf-standards">tiktok.com/community-guidelines/en/fyf-standards</a>
+    </div>
+    <div class="cite-item">
+      <strong>Meta — Violent and Graphic Content:</strong><br>
+      <a href="https://transparency.meta.com/policies/community-standards/violent-graphic-content/">transparency.meta.com/policies/community-standards/violent-graphic-content/</a>
+    </div>
+    <div class="cite-item">
+      <strong>Meta — Child Sexual Exploitation:</strong><br>
+      <a href="https://transparency.meta.com/policies/community-standards/child-sexual-exploitation-abuse-nudity/">transparency.meta.com/policies/community-standards/child-sexual-exploitation-abuse-nudity/</a>
+    </div>
+    <div class="cite-item">
+      <strong>Meta — Dangerous Organizations:</strong><br>
+      <a href="https://transparency.meta.com/policies/community-standards/dangerous-individuals-organizations/">transparency.meta.com/policies/community-standards/dangerous-individuals-organizations/</a>
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">
+  PolicyMap Decision Tree — PolicyMap_ViolenceDecisionTree.html | Version 1.0 | May 2025 | Independent Academic Analysis<br>
+  Not affiliated with or endorsed by YouTube, Reddit, TikTok, or Meta. All policy citations are from primary platform sources accessed May 2025.<br>
+  Companion documents: PolicyMap_Report_v1.0.docx (40-page report) · PolicyMap_Audit_Matrix.xlsx (master matrix + 23-gap register + platform profiles)
+</div>
+
+</body>
+</html>
